@@ -4,10 +4,6 @@ const diameterValue = document.getElementById('diameter-value');
 const sizeButtons = document.querySelectorAll('.size-btn');
 const priceInput = document.getElementById('price-input');
 const peopleCountInput = document.getElementById('people-count-input');
-const decreaseBtn = document.getElementById('decrease-btn');
-const increaseBtn = document.getElementById('increase-btn');
-const decreasePriceBtn = document.getElementById('decrease-price-btn');
-const increasePriceBtn = document.getElementById('increase-price-btn');
 const pizzaAreaDisplay = document.getElementById('pizza-area');
 const pricePerCm2Display = document.getElementById('price-per-cm2');
 const areaPerPersonDisplay = document.getElementById('area-per-person-display');
@@ -31,17 +27,17 @@ function initializeApp() {
         updateActiveButton();
     });
 
-    // Event listeners pour les boutons de taille fixe
-    sizeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const size = parseInt(this.dataset.size);
-            currentDiameter = size;
-            diameterSlider.value = size;
-            updateDiameterDisplay();
-            updateCalculations();
-            updateActiveButton();
-        });
-    });
+               // Event listeners pour les boutons de taille fixe
+           sizeButtons.forEach(button => {
+               button.addEventListener('click', function() {
+                   const size = parseInt(this.dataset.size);
+                   currentDiameter = size;
+                   diameterSlider.value = size;
+                   updateDiameterDisplay();
+                   updateCalculations();
+                   updateActiveButton();
+               });
+           });
 
     // Event listeners pour les champs de saisie
     priceInput.addEventListener('input', function() {
@@ -80,37 +76,7 @@ function initializeApp() {
         }
         updateCalculations();
     });
-
-    // Event listeners pour les boutons + et -
-    decreaseBtn.addEventListener('click', function() {
-        if (currentPeopleCount > 1) {
-            currentPeopleCount--;
-            peopleCountInput.value = currentPeopleCount;
-            updateCalculations();
-        }
-    });
-
-    increaseBtn.addEventListener('click', function() {
-        if (currentPeopleCount < 10) {
-            currentPeopleCount++;
-            peopleCountInput.value = currentPeopleCount;
-            updateCalculations();
-        }
-    });
-
-    // Event listeners pour les boutons de prix + et -
-    decreasePriceBtn.addEventListener('click', function() {
-        currentPrice = Math.max(0, currentPrice - 0.5);
-        priceInput.value = currentPrice.toFixed(1);
-        updateCalculations();
-    });
-
-    increasePriceBtn.addEventListener('click', function() {
-        currentPrice += 0.5;
-        priceInput.value = currentPrice.toFixed(1);
-        updateCalculations();
-    });
-
+    
     // Initialiser l'affichage
     updateDiameterDisplay();
     updateCalculations();
@@ -119,6 +85,11 @@ function initializeApp() {
 
 function updateDiameterDisplay() {
     diameterValue.textContent = currentDiameter;
+    
+    // Mettre à jour la barre de progression du slider
+    const slider = document.querySelector('.slider');
+    const progressWidth = ((currentDiameter - 5) / (100 - 5)) * 100;
+    slider.style.setProperty('--progress-width', progressWidth + '%');
 }
 
 function updateActiveButton() {
@@ -143,10 +114,48 @@ function updateCalculations() {
     // Calculer la surface par personne
     const areaPerPerson = pizzaArea / currentPeopleCount;
     
-    // Mettre à jour l'affichage
-    pizzaAreaDisplay.textContent = `${Math.round(pizzaArea)} cm2`;
-    pricePerCm2Display.textContent = `${pricePerCm2.toFixed(3)} €/cm2`;
-    areaPerPersonDisplay.textContent = `${Math.round(areaPerPerson)} cm2`;
+    // Mettre à jour l'affichage avec animation
+    animateValue(pizzaAreaDisplay, Math.round(pizzaArea), ' cm2');
+    animateValue(pricePerCm2Display, pricePerCm2.toFixed(3), ' €/cm2');
+    animateValue(areaPerPersonDisplay, Math.round(areaPerPerson), ' cm2');
+    
+    // Ajouter un effet visuel sur les valeurs
+    addValueEffect(pizzaAreaDisplay);
+    addValueEffect(pricePerCm2Display);
+    addValueEffect(areaPerPersonDisplay);
+}
+
+// Fonction pour animer les changements de valeurs
+function animateValue(element, newValue, unit) {
+    const currentValue = parseFloat(element.textContent.replace(/[^\d.-]/g, ''));
+    const targetValue = parseFloat(newValue);
+    
+    if (currentValue !== targetValue) {
+        element.style.transform = 'scale(1.1)';
+        element.style.color = '#d4a574';
+        
+        setTimeout(() => {
+            element.textContent = newValue + unit;
+            element.style.transform = 'scale(1)';
+            element.style.color = '';
+        }, 150);
+    } else {
+        element.textContent = newValue + unit;
+    }
+}
+
+// Fonction pour ajouter un effet visuel sur les valeurs
+function addValueEffect(element) {
+    element.style.transition = 'all 0.3s ease';
+    element.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.1)';
+        this.style.textShadow = '0 0 10px rgba(188, 108, 37, 0.5)';
+    });
+    
+    element.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.textShadow = '';
+    });
 }
 
 // Fonctions utilitaires
@@ -156,6 +165,8 @@ function formatNumber(number, decimals = 0) {
         maximumFractionDigits: decimals
     }).format(number);
 }
+
+
 
 // Gestion des erreurs
 window.addEventListener('error', function(e) {
