@@ -7,6 +7,7 @@ const peopleCountInput = document.getElementById('people-count-input');
 const pizzaAreaDisplay = document.getElementById('pizza-area');
 const pricePerCm2Display = document.getElementById('price-per-cm2');
 const areaPerPersonDisplay = document.getElementById('area-per-person-display');
+const sliderIcon = document.querySelector('.slider-icon img');
 
 // Variables
 let currentDiameter = 26;
@@ -90,6 +91,31 @@ function updateDiameterDisplay() {
     const slider = document.querySelector('.slider');
     const progressWidth = ((currentDiameter - 5) / (100 - 5)) * 100;
     slider.style.setProperty('--progress-width', progressWidth + '%');
+    
+    // Mettre à jour la taille de l'icône de pizza
+    updatePizzaIconSize();
+}
+
+function updatePizzaIconSize() {
+    // Calculer la taille de l'icône en fonction du diamètre
+    // Taille de base: 30px, taille max: 60px
+    const minSize = 30;
+    const maxSize = 60;
+    const minDiameter = 5;
+    const maxDiameter = 100;
+    
+    // Calculer le ratio de progression (0 à 1)
+    const progress = (currentDiameter - minDiameter) / (maxDiameter - minDiameter);
+    
+    // Calculer la nouvelle taille
+    const newSize = minSize + (progress * (maxSize - minSize));
+    
+    // Appliquer la transformation avec une transition fluide
+    if (sliderIcon) {
+        sliderIcon.style.transition = 'all 0.3s ease';
+        sliderIcon.style.width = newSize + 'px';
+        sliderIcon.style.height = newSize + 'px';
+    }
 }
 
 function updateActiveButton() {
